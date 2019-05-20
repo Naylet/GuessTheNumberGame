@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">GuessTheNumberGame</string>
+
+    <string name="nowa_gra">Nowa gra</string>
+    <string name="strzelam">Strzelam!</string>
+
+    <string name="title_activity_entry_fullscreen">EntryFullscreenActivity</string>
+    <string name="label_content">Guess\nThe\nNumber\nGame</string>
+
+    <string name="title_activity_fullscreen">FullscreenActivity</string>
+    <string name="top_10">TOP 10</string>
+    <string name="wyniki">Tablica wyników</string>
+    <string name="powrot">Powrót do gry</string>
+</resources>
