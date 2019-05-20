@@ -8,37 +8,39 @@
         tools:context=".TopResultsActivity">
 
     <TextView
-            android:text="@string/top_10"
-            android:layout_width="0dp"
-            android:layout_height="353dp"
+            android:layout_width="300dp"
+            android:layout_height="502dp"
             android:id="@+id/resultBoard" app:layout_constraintTop_toTopOf="parent"
             android:layout_marginTop="75dp" app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginLeft="25dp" android:layout_marginStart="26dp" android:layout_marginEnd="34dp"
-            android:layout_marginRight="35dp" app:layout_constraintEnd_toEndOf="parent"/>
+            android:layout_marginLeft="50dp" android:layout_marginStart="26dp" android:layout_marginEnd="34dp"
+            android:layout_marginRight="50dp" app:layout_constraintEnd_toEndOf="parent"/>
     <ProgressBar
             style="?android:attr/progressBarStyle"
-            android:layout_width="250dp"
-            android:layout_height="250dp"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
             android:id="@+id/progressBar"
             app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginTop="453dp" android:layout_marginEnd="81dp" android:layout_marginRight="81dp"
+            android:layout_marginTop="400dp" android:layout_marginEnd="81dp" android:layout_marginRight="81dp"
             app:layout_constraintEnd_toEndOf="parent" app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginBottom="28dp" app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginLeft="80dp" android:layout_marginStart="80dp" android:visibility="invisible"/>
+            android:layout_marginLeft="80dp" android:layout_marginStart="80dp" android:visibility="invisible"
+            app:layout_constraintVertical_bias="0.0"/>
     <Button
             android:text="@string/powrot"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/button2" app:layout_constraintTop_toTopOf="parent"
+            android:id="@+id/returnButton" app:layout_constraintTop_toTopOf="parent"
             android:layout_marginTop="16dp" app:layout_constraintStart_toStartOf="parent"
             android:layout_marginLeft="240dp" android:layout_marginStart="240dp" android:onClick="returnToMain"
             android:layout_marginEnd="36dp" android:layout_marginRight="36dp"
             app:layout_constraintEnd_toEndOf="parent"/>
-    <ListView
-            android:layout_width="182dp"
-            android:layout_height="351dp"
-            android:id="@+id/listView" app:layout_constraintTop_toTopOf="parent" android:layout_marginTop="75dp"
-            app:layout_constraintStart_toStartOf="parent" android:layout_marginLeft="195dp"
-            android:layout_marginStart="195dp" android:layout_marginEnd="34dp" android:layout_marginRight="34dp"
-            app:layout_constraintEnd_toEndOf="parent"/>
+    <Button
+            android:text="@string/odswiez"
+            android:layout_width="325dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/refreshButton" app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="600dp" app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="53dp" app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginLeft="43dp" android:layout_marginStart="43dp" android:layout_marginEnd="43dp"
+            android:layout_marginRight="43dp" app:layout_constraintEnd_toEndOf="parent" android:onClick="refresh"/>
 </android.support.constraint.ConstraintLayout>
