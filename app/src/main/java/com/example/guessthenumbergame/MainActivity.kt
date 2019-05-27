@@ -11,6 +11,7 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_top_results.*
+import java.io.IOException
 import java.net.URL
 import kotlin.random.Random
 
@@ -157,18 +158,20 @@ class MainActivity : AppCompatActivity() {
     class HttpPost(private var activity: MainActivity)  : AsyncTask<String, String, String>(){
         override fun onPreExecute() {
             super.onPreExecute()
-            //activity.progressBar.visibility = View.VISIBLE
         }
 
         override fun doInBackground(vararg params: String?): String? {
             val loginShared = activity.getSharedPreferences("com.example.guessthenumbergame.prefs", 0)
             val userLogin = loginShared.getString("userLogin", "132271")
 
-            URL("http://hufiecgniezno.pl/br/record.php?f=add&id=$userLogin&r=${activity.resultSum}").readText()
+            try {
+                URL("http://hufiecgniezno.pl/br/record.php?f=add&id=$userLogin&r=${activity.resultSum}").readText()
+                return "OK"
+            }
+            catch(e:IOException){
+                return "FAILED"
+            }
 
-            //if (connection != "err")
-
-            return "OK"
 
         }
     }
