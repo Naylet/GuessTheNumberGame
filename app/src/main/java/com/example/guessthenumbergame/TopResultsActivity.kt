@@ -50,7 +50,7 @@ class TopResultsActivity : AppCompatActivity() {
             sleep(500)
 
             try{
-                val data = URL("http://hufiecgniezno.pl/br/record.php?f=get").readText().lines()[6]
+                val data = URL("http://hufiecgniezno.pl/br/record.php?f=get").readText() //.lines()[6]
                 val json = JSONArray(data)
 
                 if (data != "") {
@@ -86,9 +86,7 @@ class TopResultsActivity : AppCompatActivity() {
 
                 val cursor = database.getData()
 
-                System.out.println(cursor.count)
-
-                if (cursor.getCount() == 0) {
+                if (cursor.count == 0) {
                     buffer.append("Brak danych w bazie")
                 } else {
                     buffer.append("TOP 10 \n")
