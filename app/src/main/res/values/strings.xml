@@ -12,4 +12,9 @@
     <string name="wyniki">Tablica wyników</string>
     <string name="powrot">Powrót do gry</string>
     <string name="odswiez">Odśwież</string>
+    <string name="wyloguj">Wyloguj się</string>
+    <string name="loginButton">Zaloguj /zarejestruj się</string>
+    <string name="password">Hasło</string>
+    <string name="login">Login</string>
+
 </resources>

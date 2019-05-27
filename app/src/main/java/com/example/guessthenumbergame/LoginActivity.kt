@@ -46,10 +46,12 @@ class LoginActivity : AppCompatActivity() {
 
                 proceed(newUser.getName(), newUser.getScore())
             } else {
-                if(passwordValidate(cursor.getString(2)))
-                    proceed(cursor.getString(1), cursor.getInt(3))
-                else
+                cursor.moveToFirst()
+                if(passwordValidate(cursor.getString(1))){
+                    proceed(cursor.getString(0), cursor.getInt(2))
+                } else{
                     Toast.makeText(this@LoginActivity, "Nieprawidłowe hasło", Toast.LENGTH_LONG).show()
+                }
             }
         }
     }
@@ -71,8 +73,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun passwordValidate(passwordCursor: String): Boolean{
-        if(password == passwordCursor) return true
-        return false
+        return password == passwordCursor
     }
 
     private fun proceed(name: String, score: Int) {

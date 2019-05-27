@@ -1,16 +1,15 @@
 package com.example.guessthenumbergame
 
-import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.AsyncTask
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
-import kotlinx.android.synthetic.main.activity_top_results.*
+import com.example.guessthenumbergame.database.UserDB
 import java.io.IOException
 import java.net.URL
 import kotlin.random.Random
@@ -20,9 +19,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var resultInfo: TextView
     private lateinit var gameInfo: TextView
     private lateinit var guess: EditText
+    private lateinit var userDatabase: UserDB
 
     var hits:Int = 0
     var resultSum:Int = 0
+    var userName:String = ""
     var randomNumber:Int = 0
     var points:Int = 0
 
@@ -33,12 +34,13 @@ class MainActivity : AppCompatActivity() {
         resultInfo = findViewById(R.id.resultInfo)
         gameInfo = findViewById(R.id.gameInfo)
         guess = findViewById(R.id.numberInput)
+        userDatabase = UserDB(this@MainActivity)
 
         getRecord()
         makeNewGame()
     }
 
-    fun fire(view: View){
+    fun fire(view :View) {
         if(guess.text.toString().toInt() < 0 || guess.text.toString().toInt() > 20){
             wrongNumberAlert()
         }
@@ -56,32 +58,46 @@ class MainActivity : AppCompatActivity() {
                         guess.setText("")
                     }
                     randomNumber ->{
-                        //put result into application cache and to remote database
-                        HttpPost(this@MainActivity).execute()
+                        //put result into application cache
                         setRecord()
-
-                        winOrLoseAlert("Wygrałeś", "Udało Ci się trafić za $hits razem. \n Zdobyłeś $points pkt")
+                        showMessage("Wygrałeś", "Udało Ci się trafić za $hits razem. \n Zdobyłeś $points pkt")
                     }
                 }
             } else {
                 if(guess.text.toString().toInt() != randomNumber){
-                    winOrLoseAlert("Przegrałeś", "Udało Ci się zdobyć $resultSum pkt")
-                } else {
-                    //put result into application cache and to remote database
                     HttpPost(this@MainActivity).execute()
+                    showMessage("Przegrałeś", "Udało Ci się zdobyć $resultSum pkt")
+                    flushRecord()
+                } else {
+                    //put result into application cache
                     setRecord()
-                    winOrLoseAlert("Wygrałeś", "Udało Ci się trafić za $hits razem. \n Zdobyłeś $points pkt")
+                    showMessage("Wygrałeś", "Udało Ci się trafić za $hits razem. \n Zdobyłeś $points pkt")
                 }
             }
         }
     }
 
-    fun newGame(view:View){
-        winOrLoseAlert("Nowa gra", "Skończyłeś z wynikiem $resultSum pkt")
+    fun newGame(view: View) {
+        HttpPost(this@MainActivity).execute()
+        showMessage("Nowa gra", "Skończyłeś z wynikiem $resultSum pkt")
+        flushRecord()
     }
 
-    fun showResultBoard(view:View){
+    fun showResultBoard(view: View) {
         startActivity(Intent(this@MainActivity, TopResultsActivity::class.java))
+    }
+
+    fun signOut(view: View){
+        userDatabase.updateData(userName,resultSum)
+
+        val loginShared = this.getSharedPreferences("com.example.guessthenumbergame.prefs", 0)
+        val editor = loginShared.edit()
+        editor.putInt("recordValue", resultSum)
+        editor.putString("userName", null)
+        editor.apply()
+
+        startActivity(Intent(this@MainActivity, LoginActivity::class.java ))
+        finish()
     }
 
     private fun makeNewGame(){
@@ -106,7 +122,7 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    private fun winOrLoseAlert(title: String, message: String){
+    private fun showMessage(title: String, message: String){
         val dialogBuilder = AlertDialog.Builder(this@MainActivity)
 
         dialogBuilder.setTitle(title)
@@ -120,14 +136,15 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    @SuppressLint("SetTextI18n")
     private fun getRecord(){
         val loginShared = this.getSharedPreferences("com.example.guessthenumbergame.prefs", 0)
+        userName = loginShared.getString("userName", null)
         resultSum = loginShared.getInt("recordValue", 0)
+
+        Toast.makeText(this@MainActivity, "Witaj $userName", Toast.LENGTH_SHORT).show()
         resultInfo.text = "Twój wynik: $resultSum"
     }
 
-    @SuppressLint("SetTextI18n")
     private fun setRecord(){
         when(hits) {
             in 1..1 -> {
@@ -152,20 +169,27 @@ class MainActivity : AppCompatActivity() {
         val editor = loginShared.edit()
         editor.putInt("recordValue", resultSum)
         editor.apply()
+
+        resultInfo.text = "Twój wynik: $resultSum"
+    }
+
+    private fun flushRecord(){
+        resultSum = 0
+
+        val loginShared = this.getSharedPreferences("com.example.guessthenumbergame.prefs", 0)
+        val editor = loginShared.edit()
+        editor.putInt("recordValue", resultSum)
+        editor.apply()
+
         resultInfo.text = "Twój wynik: $resultSum"
     }
 
     class HttpPost(private var activity: MainActivity)  : AsyncTask<String, String, String>(){
-        override fun onPreExecute() {
-            super.onPreExecute()
-        }
 
         override fun doInBackground(vararg params: String?): String? {
-            val loginShared = activity.getSharedPreferences("com.example.guessthenumbergame.prefs", 0)
-            val userLogin = loginShared.getString("userLogin", "132271")
 
             try {
-                URL("http://hufiecgniezno.pl/br/record.php?f=add&id=$userLogin&r=${activity.resultSum}").readText()
+                URL("http://hufiecgniezno.pl/br/record.php?f=add&id=${activity.userName}&r=${activity.resultSum}").readText()
                 return "OK"
             }
             catch(e:IOException){

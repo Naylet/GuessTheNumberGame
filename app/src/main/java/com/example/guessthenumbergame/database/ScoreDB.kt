@@ -42,16 +42,6 @@ class ScoreDB(context: Context): SQLiteOpenHelper(context, DATABASE_NAME, null, 
         return db.insert(TABLE_NAME , null, cv)
     }
 
-/*
-    fun updateData(rank: Rank): Int {
-        val db = this.writableDatabase
-        val cv = ContentValues()
-        cv.put(ID, rank.getID())
-        cv.put(NAME, rank.getName())
-        cv.put(SCORE, rank.getScore())
-        return db.update(TABLE_NAME, cv, "ID=?", arrayOf(rank.getID()))
-    }
-*/
     fun getData(): Cursor {
         val db = this.writableDatabase
         return db.rawQuery("SELECT * FROM $TABLE_NAME", null)
