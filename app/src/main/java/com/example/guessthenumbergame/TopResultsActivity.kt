@@ -2,10 +2,15 @@ package com.example.guessthenumbergame
 
 import android.os.AsyncTask
 import android.os.Bundle
+import android.os.Looper
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import android.widget.Toast
+import com.example.guessthenumbergame.database.ScoreDB
+import com.example.guessthenumbergame.model.Rank
 import kotlinx.android.synthetic.main.activity_top_results.*
 import org.json.JSONArray
+import java.io.IOException
 import java.lang.Thread.sleep
 import java.net.URL
 
@@ -29,36 +34,72 @@ class TopResultsActivity : AppCompatActivity() {
 
     class HttpGet(private var activity: TopResultsActivity) : AsyncTask<String, String, String>() {
 
-        private var text = "TOP 10\n"
+        private lateinit var buffer: StringBuffer
+        private lateinit var database: ScoreDB
 
         override fun onPreExecute() {
             super.onPreExecute()
             activity.refreshButton?.visibility = View.INVISIBLE
             activity.progressBar?.visibility = View.VISIBLE
+
+            database = ScoreDB(activity)
+            buffer = StringBuffer()
         }
 
         override fun doInBackground(vararg params: String?): String? {
-
             sleep(500)
 
-            try {
-                val data = URL("http://hufiecgniezno.pl/br/record.php?f=get").readText()
+            try{
+                val data = URL("http://hufiecgniezno.pl/br/record.php?f=get").readText().lines()[6]
                 val json = JSONArray(data)
+
                 if (data != "") {
                     var field: JSONArray
-                    for (i in 0..json.length()) {
+                    var rank: Rank
+
+                    database.flushDatabase()
+                    buffer.append("TOP 10 \n")
+
+                    for (i: Int in 0 until json.length()) {
                         field = json.getJSONArray(i)
-                        text += "\t" + (i + 1) + " " + field.getString(1) + " " + field.getString(2) + "\n"
+                        rank = Rank((i+1), field.getString(1), field.getInt(2))
+
+                        buffer.append("\t\t")
+                        buffer.append(rank.getID().toString() + " ")
+                        buffer.append(rank.getName() + " ")
+                        buffer.append(rank.getScore().toString() + "\n")
+
+                        val result = database.insertData(rank)
+
+                        if(result.equals(-1)){
+                            Toast.makeText(activity, "Błąd wstawiania danych do bazy", Toast.LENGTH_SHORT).show()
+                        }
                     }
-                    //wpisać do SQLite
+
                 }
-                // else if data == err wypisać z SQLite
-
-            } catch (t: Throwable) {
-                t.printStackTrace()
             }
+            catch (e:IOException){
 
+                activity.runOnUiThread {
+                    kotlin.run { Toast.makeText(activity, "Brak połączenia sieciowego.\n Dane pobrane z bazy danych", Toast.LENGTH_SHORT).show() }
+                }
 
+                val cursor = database.getData()
+
+                System.out.println(cursor.count)
+
+                if (cursor.getCount() == 0) {
+                    buffer.append("Brak danych w bazie")
+                } else {
+                    buffer.append("TOP 10 \n")
+                    while (cursor.moveToNext()) {
+                        buffer.append("\t\t")
+                        buffer.append(cursor.getInt(0).toString() + " ")
+                        buffer.append(cursor.getString(1) + " ")
+                        buffer.append(cursor.getInt(2).toString() + "\n")
+                    }
+                }
+            }
 
             return "OK"
         }
@@ -67,7 +108,7 @@ class TopResultsActivity : AppCompatActivity() {
             super.onPostExecute(result)
             activity.progressBar?.visibility = View.INVISIBLE
             activity.refreshButton?.visibility = View.VISIBLE
-            activity.resultBoard?.text = text
+            activity.resultBoard?.text = buffer.toString()
         }
     }
 
